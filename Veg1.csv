@@ -1,0 +1,43 @@
+﻿WL,Mechenism,Chem,Reff,Bool
+0430,Electron transition ,Chlorophyll a,asdi.com,0
+0460,Electron transition ,Chlorophyll b,asdi.com,1
+0640,Electron transition ,Chlorophyll b,asdi.com,0
+0660,Electron transition ,Chlorophyll a,asdi.com,0
+0910,"C-H stretch, 3rd overturn ",Protein,asdi.com,0
+0930,"C-H stretch, 3rd overturn ",Oil,asdi.com,0
+0970,"O-H stretch, 1rd overturn ","Water, Starch",asdi.com,0
+0990,"O-H stretch, 2rd overturn ",Starch,asdi.com,0
+1020,N-H stretch,Protein,asdi.com,0
+1040,"C-H stretch, C-H deformation",Oil,asdi.com,0
+1120,"C-H stretch, 2rd overturn ",Lignin,asdi.com,0
+1200,"O-H stretch, 1rd overturn ","Water, Cellulose, Starch, Lignin",asdi.com,1
+1400,"O-H stretch, 1rd overturn ",Water,asdi.com,0
+1420,"C-H stretch, C-H deformation",Lignin,asdi.com,0
+1450,"O-H stretch, 1rd overturn, C-H stretch, C-H deformation","Starch, Sugar, Lignin, Water",asdi.com,0
+1490,"O-H stretch, 1rd overturn ","Cellulose, Sugar",asdi.com,0
+1510,"N-H stretch, 1rd overturn ","Protein, Nitrogen",asdi.com,0
+1530,"O-H stretch, 1rd overturn ",Statch,asdi.com,0
+1540,"O-H stretch, 1rd overturn ","Starch, Cellulose",asdi.com,0
+1580,"O-H stretch, 1rd overturn ","Starch, Sugar ",asdi.com,0
+1690,"C-H stretch, 1rd overturn ","Lignin, Starch, Protein, Nitogen",asdi.com,0
+1780,"C-H stretch, 1rd overturn /O-H stretch/ H-O-H deformation","Cellulose, Sugar, Starch",asdi.com,1
+1820,"O-H stretch/C-O stretch, 2rd overturn ",Cellulose,asdi.com,0
+1900,"O-H stretch, C-O stretch",Starch,asdi.com,0
+1940,"O-H stretch, O-H deformation starch, cellulose","Water, Lignin, Protein, Nitrogen",asdi.com,0
+1960,O-H stretch/O-H bend,"Sugar, Starch",asdi.com,0
+1980,N-H asymmetry,Protein,asdi.com,0
+2000,"O-H stretch, C-O deformation",Starch,asdi.com,0
+2060,"N=H bend, 2nd overtone/N=H bend/N-H stretch","Protein, Nitrogen",asdi.com,0
+2080,O-H stretch/O-H deformation,"Sugar, Starch",asdi.com,0
+2100,"O=H bend/C-O stretch/C-O-C stretch, 3rd overturn ","Starch, Cellulose",asdi.com,0
+2130,N-H stretch,Protein,asdi.com,0
+2180,"N-H bend, 2rd overturn /C-H stretch/C-O stretch/C=O stretch/C-N stretch","Protein, Nitrogen",asdi.com,0
+2240,C-H stretch,Protein,asdi.com,1
+2250,"O-H stretch, O-H deformation starch",Starch,asdi.com,0
+2270,"C-H stretch/O-H stretch, CH2 bend/CH2 stretch","Cellulose, Sugar, Starch",asdi.com,0
+2280,C-H stretch/CH2 deformation ,"Starch, Cellulose",asdi.com,0
+2300,"N-H stretch, C=O stretch, C-H bend, 2nd overtone","Protein, Nitrogen",asdi.com,0
+2310,"C-H bend, 2nd overtone",Oil,asdi.com,0
+2320,C-H stretch/CH2 deformation ,Starch,asdi.com,1
+2340,C-H stretch/O-H deformation/C-H deformation/O-H stretch,Cellulose,asdi.com,1
+2350,"CH2 bend, 2nd overtone, C-H deformation 2nd overturn ","Cellulose, Protein, Nitrogen",asdi.com,0
