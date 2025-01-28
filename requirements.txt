@@ -1,0 +1,10 @@
+numpy
+pandas
+matplotlib
+scikit-learn
+lazypredict
+spectral
+seaborn
+scipy
+pymongo
+python-dotenv
