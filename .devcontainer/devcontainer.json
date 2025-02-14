@@ -18,7 +18,7 @@
 	// Configure tool-specific properties.
 	"customizations": {
 		"vscode": {
-		  "extensions": ["ms-toolsai.jupyter", "ms-python.python"]
+		  "extensions": ["ms-toolsai.jupyter", "ms-python.python", "quarto.quarto"]
 		}
 	  },
 

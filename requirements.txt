@@ -8,3 +8,4 @@ seaborn
 scipy
 pymongo
 python-dotenv
+quarto-cli
