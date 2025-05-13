@@ -9,3 +9,11 @@ scipy
 pymongo
 python-dotenv
 quarto-cli
+specdal
+
+Pillow
+PyQt5
+PyQt5_sip
+pyqtgraph
+pyshp
+rasterio

@@ -27,7 +27,9 @@
 	//"--shm-size=1g", "--ulimit", "memlock=-1", "--ulimit", "stack=67108864"
 
 	// Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
-	"remoteUser": "root"
+	"remoteUser": "root",
+
+	"mounts": ["source=/home/jwvandyke/projects/upwins/data,target=/workspaces/NN_Hyperspectral_Vegetation/data,type=bind,consistency=cached"]
 
 	//"mounts": ["source=/home/gta/data,target=/workspaces/mm_general_dev/input_dir,type=bind,consistency=cached"]
 }

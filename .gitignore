@@ -4,3 +4,5 @@ asd/
 __pycache__
 output/
 old/
+best_spectral*
+*.pkl
