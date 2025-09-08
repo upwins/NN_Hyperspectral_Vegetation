@@ -29,7 +29,9 @@
 	// Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
 	//"remoteUser": "root",
 
-	"mounts": ["source=${localEnv:HOME}/projects/upwins/data,target=/workspaces/NN_Hyperspectral_Vegetation/data,type=bind,consistency=cached"]
+	"mounts": ["source=${localEnv:HOME}/projects/upwins/data,target=/workspaces/NN_Hyperspectral_Vegetation/data,type=bind,consistency=cached",
+	"source=/mnt/d,target=/workspaces/NN_Hyperspectral_Vegetation/data/D-drive,type=bind,consistency=cached"]
+	//
 
 	//"mounts": ["source=/home/gta/data,target=/workspaces/mm_general_dev/input_dir,type=bind,consistency=cached"]
 }
