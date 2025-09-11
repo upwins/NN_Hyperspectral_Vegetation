@@ -337,15 +337,21 @@ class SpectralCollection():
     def select_indicies_with_filter(self, filter):
         selected_indices = np.arange(len(self.name))
 
+        mask = np.ones(len(self.name), dtype=bool)
         for k,v in filter.items():
             selected_indices = selected_indices[self.code_dict[k][0][selected_indices]==v]
+            mask &= (self.code_dict[k][0] == v)
+        
+        return np.where(mask)[0]
 
         return selected_indices
 
     def plot_with_filter(self, filter, plotby, colormap='gray'):
         selected_indices = np.arange(len(self.name))
+        selected_indices = self.select_indicies_with_filter(filter)
         title = ""
 
+        
         for k,v in filter.items():
             selected_indices = selected_indices[self.code_dict[k][0][selected_indices]==v]
             title = title + k + '=' + v + ', '
