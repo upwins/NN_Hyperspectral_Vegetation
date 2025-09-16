@@ -188,7 +188,8 @@ def classify_and_save_image(fname_hdr, output_dir, model, scaler, label_maps, ta
         print(f"Found {n_valid_pixels} valid pixels to classify.")
 
         # --- 2. Prepare for Batch Prediction ---
-        PREDICTION_BATCH_SIZE = 32768
+        #PREDICTION_BATCH_SIZE = 262144
+        PREDICTION_BATCH_SIZE = 524288
         label_to_int_maps = {task: {label: i for i, label in enumerate(labels)} for task, labels in label_maps.items()}
 
         classification_maps_flat = {task: np.full(im.nrows * im.ncols, -1, dtype=np.int16) for task in task_names}
@@ -242,38 +243,62 @@ def classify_and_save_image(fname_hdr, output_dir, model, scaler, label_maps, ta
 # --- MAIN SCRIPT EXECUTION ---
 # =============================================================================
 
-def batch_classify_directory(input_dir, output_dir, model, scaler, label_maps, task_names):
+def batch_classify(input_source, output_dir, model, scaler, label_maps, task_names):
     """
-    Finds all ENVI images in a directory and runs the classification process on them.
+    Processes ENVI images from a single file, a directory, or a list of files.
 
     Args:
-        input_dir (str): Path to the directory containing ENVI images.
+        input_source (str or list): Can be one of:
+                                    - A path to a single ENVI .hdr file.
+                                    - A path to a directory containing ENVI .hdr files.
+                                    - A list of paths to one or more ENVI .hdr files.
         output_dir (str): Path to the directory where results will be saved.
         model, scaler, label_maps, task_names: Objects required for prediction.
     """
     # --- 1. Validate paths and create output directory ---
-    if not os.path.isdir(input_dir):
-        print(f"Error: Input directory not found at '{input_dir}'")
-        return
-
     os.makedirs(output_dir, exist_ok=True)
     print(f"Results will be saved in: '{os.path.abspath(output_dir)}'")
 
-    # --- 2. Find all ENVI header files ---
-    # Using glob is a reliable way to find all files matching a pattern.
-    search_pattern = os.path.join(input_dir, '*.hdr')
-    envi_files = glob.glob(search_pattern)
+    # --- 2. Determine input type and get list of files ---
+    envi_files = []
+    if isinstance(input_source, list):
+        # Input is a list of file paths
+        envi_files = [f for f in input_source if os.path.isfile(f) and f.lower().endswith('.hdr')]
+        invalid_files = [f for f in input_source if f not in envi_files]
+        if invalid_files:
+            print(f"Warning: The following paths were invalid or not .hdr files and will be skipped: {invalid_files}")
+    elif isinstance(input_source, str):
+        if os.path.isdir(input_source):
+            # Input is a directory path
+            print(f"Searching for ENVI images in directory: '{input_source}'")
+            search_pattern = os.path.join(input_source, '*.hdr')
+            envi_files = glob.glob(search_pattern)
+        elif os.path.isfile(input_source):
+            # Input is a single file path
+            if input_source.lower().endswith('.hdr'):
+                envi_files = [input_source]
+            else:
+                print(f"Warning: Input file is not an ENVI header (.hdr) file: {input_source}")
+        else:
+            print(f"Error: Input path '{input_source}' is not a valid file or directory.")
+            return
+    else:
+        print(f"Error: 'input_source' must be a directory path (string) or a list of file paths. Got: {type(input_source)}")
+        return
 
     if not envi_files:
-        print(f"No ENVI header (.hdr) files found in '{input_dir}'.")
+        print("No valid ENVI header (.hdr) files found to process.")
         return
 
     print(f"\nFound {len(envi_files)} ENVI images to process.")
 
     # --- 3. Loop through each file and process it ---
     for hdr_path in envi_files:
-        classify_and_save_image(hdr_path, output_dir, model, scaler, label_maps, task_names)
-    
+        try:
+            classify_and_save_image(hdr_path, output_dir, model, scaler, label_maps, task_names)
+        except Exception as e:
+            print(f"An unexpected error occurred while processing {hdr_path}: {e}")
+
     print("\n" + "="*80)
     print("--- Batch processing complete for all images. ---")
     print("="*80)
@@ -291,6 +316,6 @@ def batch_classify_directory(input_dir, output_dir, model, scaler, label_maps, t
 #     # task_names = ...
     
 #     # Run the main function
-#     batch_classify_directory(
+#     batch_classify(
 #         INPUT_DIRECTORY, OUTPUT_DIRECTORY, model, scaler, label_maps, task_names
 #     )
