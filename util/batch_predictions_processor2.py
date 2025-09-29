@@ -2,7 +2,7 @@ import os
 import numpy as np
 import spectral
 import glob
-import gc  # --- FIX: Moved import to the top of the script for global scope ---
+import gc
 
 def predict_spectra(new_spectra, model, scaler, label_maps, task_names):
     """
@@ -119,26 +119,18 @@ def predict_spectra(new_spectra, model, scaler, label_maps, task_names):
 def classify_and_save_image(fname_hdr, output_dir, model, scaler, label_maps, task_names, rows_per_chunk=512):
     """
     Opens, classifies, and saves results for a single ENVI image.
-
-    Args:
-        fname_hdr (str): Path to the input ENVI header file (.hdr).
-        output_dir (str): Path to the directory where results will be saved.
-        model: The trained model object.
-        scaler: The fitted scaler object.
-        label_maps (dict): Dictionary mapping task names to their labels.
-        task_names (list): List of task names.
-        rows_per_chunk (int): The number of rows to load and process at a time to manage memory.
     """
     print("\n" + "="*80)
     print(f"--- Processing Image: {os.path.basename(fname_hdr)} ---")
     print("="*80)
     
-    # Initialize large variables to None for the finally block
-    im = memmap_im = im_chunk = im_list_chunk = valid_spectra_chunk = classification_maps_flat = None
+    # Initialize only the function-level variables to None
+    im = memmap_im = classification_maps_flat = None
     
     try:
         # --- 1. Open the image and prepare for processing ---
         im = spectral.envi.open(fname_hdr)
+        memmap_im = im.open_memmap(writeable=False)
         total_pixels = im.nrows * im.ncols
 
         # --- 2. Prepare for chunked processing ---
@@ -149,7 +141,6 @@ def classify_and_save_image(fname_hdr, output_dir, model, scaler, label_maps, ta
         classification_maps_flat = {task: np.full(total_pixels, -1, dtype=np.int16) for task in task_names}
 
         # --- 3. Run Prediction in Chunks ---
-        memmap_im = im.open_memmap(writeable=False) # Open memmap once before the loop
         num_chunks = int(np.ceil(im.nrows / rows_per_chunk))
 
         for i in range(num_chunks):
@@ -157,12 +148,8 @@ def classify_and_save_image(fname_hdr, output_dir, model, scaler, label_maps, ta
             end_row = min((i + 1) * rows_per_chunk, im.nrows)
             print(f"  Processing chunk {i+1}/{num_chunks} (rows {start_row}-{end_row-1})...")
 
-            # Load a chunk from the memory-mapped file into a concrete numpy array
             im_chunk = np.array(memmap_im[start_row:end_row, :, :])
-            chunk_pixels = im_chunk.shape[0] * im_chunk.shape[1]
-            im_list_chunk = np.reshape(im_chunk, (chunk_pixels, im.nbands))
-
-            # Identify valid pixels within the chunk
+            im_list_chunk = np.reshape(im_chunk, (im_chunk.shape[0] * im_chunk.shape[1], im.nbands))
             valid_pixel_mask_chunk = np.sum(im_list_chunk, axis=1) > 0
             valid_spectra_chunk = im_list_chunk[valid_pixel_mask_chunk, :]
 
@@ -172,27 +159,22 @@ def classify_and_save_image(fname_hdr, output_dir, model, scaler, label_maps, ta
                 gc.collect()
                 continue
 
-            # Predict on the valid spectra for this chunk
             chunk_predictions = predict_spectra(valid_spectra_chunk, model, scaler, label_maps, task_names)
-
-            # Map results back to the flat classification map
+            
             chunk_pixel_indices = np.where(valid_pixel_mask_chunk)[0]
             global_indices_for_chunk = chunk_pixel_indices + (start_row * im.ncols)
 
             if chunk_predictions and isinstance(chunk_predictions[0], dict) and "error" in chunk_predictions[0]:
                 print(f"    Skipping result mapping for chunk {i+1} due to prediction error.")
-                del im_chunk, im_list_chunk, valid_spectra_chunk, chunk_predictions
-                gc.collect()
-                continue
+            else:
+                for task in task_names:
+                    label_to_int = label_to_int_maps[task]
+                    predicted_labels = [p[task] for p in chunk_predictions]
+                    predicted_ints = np.array([label_to_int.get(label, -1) for label in predicted_labels], dtype=np.int16)
+                    classification_maps_flat[task][global_indices_for_chunk] = predicted_ints
 
-            for task in task_names:
-                label_to_int = label_to_int_maps[task]
-                predicted_labels = [p[task] for p in chunk_predictions]
-                predicted_ints = np.array([label_to_int.get(label, -1) for label in predicted_labels], dtype=np.int16)
-                classification_maps_flat[task][global_indices_for_chunk] = predicted_ints
-
-            # Explicitly release memory at the end of each chunk loop
-            del im_chunk, im_list_chunk, valid_spectra_chunk, chunk_predictions
+            # This is the correct place to clean up loop-specific variables
+            del im_chunk, im_list_chunk, valid_spectra_chunk, chunk_predictions, valid_pixel_mask_chunk
             gc.collect()
         
         print("Prediction complete.")
@@ -215,9 +197,7 @@ def classify_and_save_image(fname_hdr, output_dir, model, scaler, label_maps, ta
         print(f"Details: {e}\n")
     finally:
         # --- 5. Explicitly release memory ---
-        # --- FIX: Removed im.close() as the object does not have this method ---
-        # The most important cleanup is deleting the large numpy arrays and calling gc.collect()
-        del im, memmap_im, im_chunk, im_list_chunk, valid_spectra_chunk, classification_maps_flat
+        del im, memmap_im, classification_maps_flat
         gc.collect()
 
 
