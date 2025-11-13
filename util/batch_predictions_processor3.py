@@ -178,10 +178,11 @@ def classify_and_save_image(fname_hdr, output_dir, model, scaler, label_maps, ta
             
             spectra_to_predict = valid_spectra_chunk
 
-            # Check for 'crisfield' and apply pixel-wise normalization if found
-            if "crisfield" in fname_hdr.lower():
-                # Pixel-wise normalization for "crisfield" only
-                print("    Running pixel-wise normalization for 'crisfield' file.")
+            # Check for substrings and apply pixel-wise normalization if found
+            substring_list = ["crisfield", "piloted"]
+            if any(sub_str in fname_hdr.lower() for sub_str in substring_list):
+                # Pixel-wise normalization
+                print("    Running pixel-wise normalization.")
                 min_vals_pixel = np.min(spectra_to_predict, axis=1, keepdims=True)
                 max_vals_pixel = np.max(spectra_to_predict, axis=1, keepdims=True)
                 range_vals_pixel = max_vals_pixel - min_vals_pixel

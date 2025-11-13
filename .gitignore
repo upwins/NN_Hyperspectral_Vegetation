@@ -8,3 +8,6 @@ best_spectral*
 *.pkl
 2. Convert Images to Reflectance.ipynb
 convert_images_to_reflectance.py
+reports*
+models*
+scalers*
